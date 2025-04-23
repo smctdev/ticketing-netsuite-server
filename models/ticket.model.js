@@ -76,6 +76,9 @@ const Ticket = db.define('ticket', {
   notifAutomation: {
     type: DataTypes.INTEGER
   },
+  notifAUTM: {
+    type: DataTypes.INTEGER
+  },
   notifAdmin: {
     type: DataTypes.INTEGER
   },
@@ -103,8 +106,30 @@ const Ticket = db.define('ticket', {
       key: 'login_id',
     }
   },
+  approveAutm: {
+    type: DataTypes.INTEGER,
+    references:{
+      model: User,
+      key: 'login_id',
+    }
+  },
   answer: {
     type: DataTypes.INTEGER
+  },
+  appTBranchHead: {
+    type: DataTypes.STRING
+  },
+  appTAccStaff: {
+    type: DataTypes.STRING
+  },
+  appTAccHead: {
+    type: DataTypes.STRING
+  },
+  appTAutomationHead: {
+    type: DataTypes.STRING
+  },
+  appTEdited: {
+    type: DataTypes.STRING
   }
   
 },{
@@ -119,6 +144,7 @@ Ticket.belongsTo(BranchList, { foreignKey: 'branch_id', as: 'Branch' });
 Ticket.belongsTo(User, { foreignKey: 'approveHead', as: 'ApproveHead' });
 Ticket.belongsTo(User, { foreignKey: 'approveAcctgStaff', as: 'ApproveAccountingStaff' });
 Ticket.belongsTo(User, { foreignKey: 'approveAcctgSup', as: 'ApproveAccountingHead' });
+Ticket.belongsTo(User, { foreignKey: 'approveAutm', as: 'AutomationHead' });
 Ticket.belongsTo(User, { foreignKey: 'edited_by', as: 'Automation' });
 
 module.exports = Ticket;

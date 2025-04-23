@@ -16,6 +16,7 @@ const createCategory = async (req, res) => {
         category_shortcut,
         category_name,
         group_code,
+        show_hide: "show",
       });
 
       return res.status(201).json({ message: "Category added" });
@@ -72,6 +73,7 @@ const updateCategory = async (req, res) => {
         category_shortcut,
         category_name,
         group_code,
+        show_hide: "show",
       },
       {
         where: { ticket_category_id: categoryID },
@@ -124,6 +126,9 @@ const deleteCategory = async (req, res) => {
 const getAllCategories = async (req, res) => {
   try {
     const allCategories = await Category.findAll({
+      where: {
+        show_hide: 'show' // Only fetch categories with show_hide = 'show'
+      },
       order: [["category_name", "ASC"]],
     });
     return res.json(allCategories);
@@ -181,6 +186,31 @@ const getAllCategoryGroup = async (req, res) => {
   }
 };
 
+const updateCategoryStatus = async (req, res) => {
+  const categoryID = req.params.categoryID;
+  const { show_hide } = req.body;
+
+  try {
+    const category = await Category.findByPk(categoryID);
+    
+    if (!category) {
+      return res.status(404).json({ message: "Category not found" });
+    }
+
+    await Category.update(
+      { show_hide: show_hide },
+      { where: { ticket_category_id: categoryID } }
+    );
+
+    return res.status(200).json({ message: "Category status updated" });
+  } catch (error) {
+    console.error("Error updating category status:", error);
+    return res
+      .status(500)
+      .json({ message: "An error occurred while updating category status" });
+  }
+};
+
 module.exports = {
   createCategory,
   updateCategory,
@@ -189,4 +219,5 @@ module.exports = {
   deleteCategory,
   tableCategories,
   getAllCategoryGroup,
+  updateCategoryStatus
 };

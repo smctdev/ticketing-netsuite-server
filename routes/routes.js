@@ -105,6 +105,7 @@ router.put('/assignedToUpdate', assignedController.assignedToUpdate);
 router.put('/uploadProfilePic', upload.profileUpload.single('profileImage'), verifyAccessToken, profileController.uploadProfilePic);
 router.put('/updateApprovalStatus/:ticketID', verifyAccessToken, ticketController.updateApproved);
 router.put('/updateNote/:ticketID', verifyAccessToken, ticketController.updateNote);
+router.put('/updateCategoryStatus/:categoryID', verifyAccessToken, categoryController.updateCategoryStatus);
 
 router.delete('/deleteCategory/:categoryID', categoryController.deleteCategory);
 router.delete('/deleteSupplier/:supplierID', supplierController.deleteSupplier);

@@ -24,7 +24,11 @@ const Category = db.define('ticket_category', {
       model: CategoryGroup,
       key: 'id',
     },
-  }
+  },
+  show_hide: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
 },{
   freezeTableName: true,
   timestamps: false

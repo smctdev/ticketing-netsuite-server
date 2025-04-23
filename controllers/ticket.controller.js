@@ -109,11 +109,17 @@ const createTicket = async (req, res) => {
     let notifAccounting = 0;
     let notifAutomation = 0;
     let notifAdmin = 0;
+    let notifAUTM = 0;
     let isApproved = 0;
     let displayTicket = 0;
     let isCounted = 0;
     let Answer = null;
-
+    let appTBranchHead = null;
+    let appTAccStaff = null;
+    let appTAccHead = null;
+    let appTAutomationHead = null;
+    let appTEdited = null;
+    
     if (user.user_role_id === 5) {
       notifHead = 1;
       displayTicket = 7;
@@ -154,9 +160,8 @@ const createTicket = async (req, res) => {
       notifAccounting = 31;
       displayTicket = 31;
     } else {
-      notifAdmin = 1;
-      notifAutomation = 1;
-      displayTicket = 8;
+      notifAUTM = 1;
+      displayTicket = 100;
     }
 
     await sequelize.transaction(async (t) => {
@@ -188,10 +193,16 @@ const createTicket = async (req, res) => {
         notifHead,
         notifAccounting,
         notifAutomation,
+        notifAUTM,
         notifAdmin,
         isApproved,
         displayTicket,
         answer: Answer,
+        appTBranchHead,
+        appTAccStaff,
+        appTAccHead,
+        appTAutomationHead,
+        appTEdited,
       });
 
       return createdTicket;
@@ -247,6 +258,11 @@ const getAllTickets = async (req, res) => {
     if (user.user_role_id === 2) {
       whereClause.assigned_person = login_id;
       whereClause.displayTicket = 8;
+      whereClause.status = "PENDING";
+    } else if (user.user_role_id === 9) {
+      whereClause.displayTicket = {
+        [Op.or]: [100, 8]  // Sequelize syntax for "displayTicket = 100 OR displayTicket = 8"
+      };
       whereClause.status = "PENDING";
     } else if (user.user_role_id === 3 && groupCodes.includes(1)) {
       whereClause.displayTicket = 1;
@@ -628,6 +644,16 @@ const viewTicket = async (req, res) => {
           ],
         },
         {
+          model: User,
+          as: "AutomationHead",
+          include: [
+            {
+              model: UserDetails,
+              as: "UserDetails",
+            },
+          ],
+        },
+        {
           model: TicketDetails,
           as: "TicketDetails",
           attributes: {
@@ -849,6 +875,7 @@ const returnToAutomation = async (req, res) => {
         notifStaff: 0,
         notifHead: 0,
         notifAccounting: 0,
+        appTEdited: null,
       },
       {
         where: { ticket_id: ticketID },
@@ -1121,6 +1148,16 @@ const viewReports = async (req, res) => {
         },
         {
           model: User,
+          as: "AutomationHead",
+          include: [
+            {
+              model: UserDetails,
+              as: "UserDetails",
+            },
+          ]
+        },
+        {
+          model: User,
           as: "ApproveHead",
           include: [
             {
@@ -1374,10 +1411,15 @@ const updateTicketStatus = async (req, res) => {
     const isLastMonth = inputDate <= lastMonthEndDate;
     console.log("LAST MONTH APPROVED: ", isLastMonth);
 
+    const currentDateTime = new Date().toLocaleString("en-US", {
+      timeZone: "Asia/Manila",
+    });
+
     let notifStaff = ticket.notifStaff;
     let notifHead = ticket.notifHead;
     let notifAccounting = ticket.notifAccounting;
     let notifAutomation = ticket.notifAutomation;
+    let notifAUTM = ticket.notifAUTM;
     let notifAdmin = ticket.notifAdmin;
     let stat = ticket.status;
     let isApproved = ticket.isApproved;
@@ -1388,6 +1430,12 @@ const updateTicketStatus = async (req, res) => {
     let approveHead = ticket.approveHead;
     let approveAcctgStaff = ticket.approveAcctgStaff;
     let approveAcctgSup = ticket.approveAcctgSup;
+    let approveAutm = ticket.approveAutm;
+    let appTBranchHead = ticket.appTBranchHead;
+    let appTAccStaff = ticket.appTAccStaff;
+    let appTAccHead = ticket.appTAccHead;
+    let appTAutomationHead = ticket.appTAutomationHead;
+    let appTEdited = ticket.appTEdited;
 
     if (status === "APPROVED") {
       if (user.user_role_id === 4) {
@@ -1422,60 +1470,67 @@ const updateTicketStatus = async (req, res) => {
           notifAccounting = 31;
           displayTicket = 31;
         }  else {
-          notifAdmin = 1;
-          notifAutomation = 1;
-          displayTicket = 8;
+          notifAUTM = 1;
+          displayTicket = 100;
         }
-        notifStaff = 1;
         approveHead = userID;
+        appTBranchHead = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 2) {
         displayTicket = 2;
         notifAccounting = 2;
         approveAcctgStaff = userID;
+        appTAccStaff = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 3) {
         displayTicket = 3;
         notifAccounting = 3;
         approveAcctgStaff = userID;
+        appTAccStaff = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 4) {
         displayTicket = 4;
         notifAccounting = 4;
         approveAcctgStaff = userID;
+        appTAccStaff = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 8) {
         displayTicket = 9;
         notifAccounting = 9;
         approveAcctgStaff = userID;
+        appTAccStaff = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 9) {
         displayTicket = 20;
         notifAccounting = 20;
         approveAcctgStaff = userID;
+        appTAccStaff = currentDateTime;
       } else if (user.user_role_id === 7 && tixCategory.group_code === 10) {
         displayTicket = 30;
         notifAccounting = 30;
         approveAcctgStaff = userID;
-      } else if (
-        user.user_role_id === 3 &&
-        tixCategory.group_code >= 1 &&
-        tixCategory.group_code <= 10
-      ) {
-        notifAutomation = 2;
-        notifAdmin = 2;
-        displayTicket = 8;
-        notifHead = 5;
-        notifStaff = 6;
+        appTAccStaff = currentDateTime;
+      } else if ( user.user_role_id === 3 && tixCategory.group_code >= 1 && tixCategory.group_code <= 10) {
+        notifAUTM = 1;
+        displayTicket = 100;
+        // notifHead = 5;
+        // notifStaff = 6;
         approveAcctgSup = userID;
+        appTAccHead = currentDateTime;
+      } else if ( user.user_role_id === 9 ) {
+        notifAutomation = 1;
+        notifAdmin = 1;
+        displayTicket = 8;
+        approveAutm = userID;
+        appTAutomationHead = currentDateTime;
       }
-    } else if (
-      status === "EDITED" &&
-      (user.user_role_id === 1 || user.user_role_id === 2)
-    ) {
+    } else if ( status === "EDITED" && (user.user_role_id === 1 || user.user_role_id === 2) ) {
       notifStaff = 5;
       notifHead = 4;
-      notifAccounting = 8;
+      // notifAccounting = 8;
       stat = "EDITED";
       edited_by = userID;
       date_completed = formattedDate;
+      appTEdited = currentDateTime;
       if (isCheckboxChecked === true) {
         isCounted = 1;
+      } else {
+        isCounted = 0;
       }
     } else if (status === "REJECTED") {
       if (user.user_role_id === 1 || user.user_role_id === 2) {
@@ -1494,6 +1549,10 @@ const updateTicketStatus = async (req, res) => {
         notifStaff = 3;
         notifHead = 2;
         stat = "REJECTED";
+      } else if (user.user_role_id === 9) {
+        notifStaff = 4;
+        notifHead = 3;
+        stat = "REJECTED";
       }
     }
 
@@ -1504,6 +1563,7 @@ const updateTicketStatus = async (req, res) => {
         notifAccounting,
         notifAutomation,
         notifAdmin,
+        notifAUTM,
         status: stat,
         isApproved,
         edited_by,
@@ -1512,6 +1572,12 @@ const updateTicketStatus = async (req, res) => {
         approveHead,
         approveAcctgStaff,
         approveAcctgSup,
+        approveAutm,
+        appTBranchHead,
+        appTAccStaff,
+        appTAccHead,
+        appTAutomationHead,
+        appTEdited,
       },
       {
         where: {

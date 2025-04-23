@@ -151,6 +151,19 @@ const notifRead = async (req, res) => {
             });
         
             return res.status(200).json({ message: 'Successfully updated notif to 0' });
+        } else if (notifID === 100){
+            
+            if (!ticket) {
+                return res.status(404).json({ message: 'Ticket not found' });
+            }
+
+            await Ticket.update({
+                notifAUTM: 0 
+            } , {
+                where: { ticket_id: ticketId }
+            });
+        
+            return res.status(200).json({ message: 'Successfully updated notif to 0' });
         }
     } catch (error) {
         
