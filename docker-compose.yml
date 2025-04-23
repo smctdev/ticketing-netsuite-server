@@ -14,3 +14,5 @@ services:
       DB_DATABASE: ticketing_netsuite
       DB_USERNAME: smct
       DB_PASSWORD: smct 
+    volumes:
+      - /mnt/nvme0n1/ticketing_netsuite_uploads:/app/uploads
