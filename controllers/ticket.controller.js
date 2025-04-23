@@ -510,7 +510,8 @@ const deleteTicket = async (req, res) => {
 
     const filesToDeleteArray = JSON.parse(ticketDetails.td_support);
 
-    const uploadsDir = path.join(__dirname, "../../uploads");
+    //const uploadsDir = path.join(__dirname, "../../uploads");
+    const uploadsDir = path.join(__dirname, "/app/uploads");
 
     filesToDeleteArray.forEach((fileName) => {
       const filePath = path.join(uploadsDir, fileName);
@@ -725,7 +726,9 @@ const updateTicket = async (req, res) => {
   // Parse filesToDelete from query parameter
   const filesToDeleteArray = filesToDelete ? JSON.parse(filesToDelete) : [];
 
-  const uploadsDir = path.join(__dirname, "../../uploads");
+  //const uploadsDir = path.join(__dirname, "../../uploads");
+
+  const uploadsDir = path.join(__dirname, "/app/uploads");
 
   filesToDeleteArray.forEach((fileName) => {
     const filePath = path.join(uploadsDir, fileName);
