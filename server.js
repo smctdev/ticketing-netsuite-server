@@ -13,7 +13,7 @@ app.use(cors({
 
 app.use(cookieParser());
 //app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
-app.use('/uploads', express.static(path.join(__dirname, '/app/uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '/mnt/nvme0n1/ticketing_netsuite_uploads')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
