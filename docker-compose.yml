@@ -16,3 +16,12 @@ services:
       DB_PASSWORD: smct 
     volumes:
       - /mnt/nvme0n1/ticketing_netsuite_uploads:/app/uploads
+
+  cloudflared-ticketing-netsuite-server:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-ticketing-netsuite-server-tunnel
+    restart: unless-stopped
+    command: tunnel run --url http://ticketing-netsuite-server:7020
+    environment:
+    - TUNNEL_TOKEN=eyJhIjoiODE3YmEzYzg5MGM0YTRmYzRjN2YwYTg1NmQ3YzFmODciLCJ0IjoiZjQyNDRlZjktY2JiMC00NGFkLThkMzEtNzhlMjg2MTk2ZTFhIiwicyI6Ik9EQm1NbVZsTlRFdFlUWmtOeTAwWlRkaExUazFaVGd0TlRjMk9XUXdNRFZqTmpoaCJ9
+
